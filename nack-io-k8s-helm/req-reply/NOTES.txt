@@ -1,0 +1,23 @@
+Status: working 
+
+https://github.com/nats-io/nats.go/tree/master/examples/nats-req
+https://github.com/nats-io/nats.go/tree/master/examples/nats-rply
+
+$ cd helm 
+$ make install-nats 
+$ make install-nack 
+$ make portforward 
+
+$ cd reply
+$ make run 
+
+On another terminal
+
+$ make run2 
+
+
+$ cd request
+$ make run 
+
+Either run or run2 will reply to the request. But not both 
+

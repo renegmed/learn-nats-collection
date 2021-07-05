@@ -1,0 +1,44 @@
+Status: working
+
+https://github.com/nats-io/k8s/tree/master/helm/charts
+
+
+# ---- nat/stan run by helm --------------
+
+$ helm repo add nats https://nats-io.github.io/k8s/helm/charts/
+$ helm install my-nats nats/nats
+$ helm install my-stan nats/stan --set stan.nats.url=nats://my-nats:4222
+
+$ kubectl exec -n default -it my-nats-box -- /bin/sh -l
+
+my-nats-box:~# stan-sub -c my-stan -s my-nats foo
+Connected to my-nats clusterID: [my-stan] clientID: [stan-sub]
+Listening on [foo], clientID=[stan-sub], qgroup=[] durable=[]
+
+
+$ kubectl logs pod/nats-0 -c nats -n nats
+
+$ kubectl logs pod/stan-0 -c stan -n nats
+
+
+$ cd helm 
+
+$ make namespace
+
+$ make install-nats 
+
+$ make install-stan 
+
+$ make portforward
+
+
+# ------- stand alone applications (non-tls) ---------
+
+$ cd subscriber 
+
+$ make run 
+
+
+$ cd publisher
+
+$ make run 

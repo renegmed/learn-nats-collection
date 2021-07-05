@@ -1,0 +1,133 @@
+NAME: nack
+LAST DEPLOYED: Fri Jul  2 04:57:37 2021
+NAMESPACE: default
+STATUS: pending-install
+REVISION: 1
+TEST SUITE: None
+HOOKS:
+MANIFEST:
+---
+# Source: nack/templates/rbac-jetstream-controller.yml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jetstream-controller
+  #namespace: default
+  namespace: nats
+---
+# Source: nack/templates/rbac-jetstream-controller.yml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jetstream-controller-cluster-role
+  # namespace: default
+  namespace: nats
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - events
+  verbs:
+  - create
+  - update
+  - patch
+- apiGroups:
+  - jetstream.nats.io
+  resources:
+  - streams
+  - streams/status
+  - consumers
+  - consumers/status
+  - streamtemplates
+  - streamtemplates/status
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - patch
+  - update
+  - delete
+---
+# Source: nack/templates/rbac-jetstream-controller.yml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jetstream-controller-cluster-role-binding
+  # namespace: default
+  namespace: nats
+subjects:
+- kind: ServiceAccount
+  name: jetstream-controller
+  # namespace: default
+  namespace: nats
+roleRef:
+  kind: ClusterRole
+  name: jetstream-controller-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: nack/templates/deployment-jetstream-controller.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nack
+  namespace: nats
+  labels:
+    app: nack
+    chart: nack-0.8.0
+spec:
+  selector:
+    matchLabels:
+      app: nack
+
+  # Singleton Replica per JetStream controller
+  replicas: 1
+
+  template:
+    metadata:
+      labels:
+        app: nack
+        chart: nack-0.8.0
+    spec:
+      terminationGracePeriodSeconds: 30
+      volumes:
+
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - nack
+            topologyKey: kubernetes.io/hostname
+
+      serviceAccountName: jetstream-controller
+
+      containers:
+        - name: jsc
+          image: natsio/jetstream-controller:0.3.0
+          command:
+          - /jetstream-controller
+          - -s=nats://nats:4222
+
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+
+          volumeMounts:
+
+NOTES:
+You can find more information about running NATS JetStream Controller on
+Kubernetes here:
+
+  https://github.com/nats-io/nack
+
+Thanks for using NATS JetStream Controller!

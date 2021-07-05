@@ -1,0 +1,200 @@
+NAME: nats
+LAST DEPLOYED: Thu Jun 24 18:07:10 2021
+NAMESPACE: default
+STATUS: pending-install
+REVISION: 1
+TEST SUITE: None
+HOOKS:
+MANIFEST:
+---
+# Source: stan/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nats-config
+  namespace: nats
+  labels:
+    app: nats
+    chart: stan-0.8.0
+data:
+  stan.conf: |-
+    #########################
+    # NATS Streaming Config #
+    #########################
+    streaming {
+      id: nats
+
+      ###############################
+      #  Store Config               #
+      ###############################
+      store: "file"
+      dir: /data/stan/store
+      partitioning: false
+    }
+
+    ###############################################
+    #                                             #
+    #            Embedded NATS Config             #
+    #                                             #
+    ###############################################
+    
+    
+    # PID file shared with configuration reloader.
+    pid_file: "/var/run/stan/stan.pid"
+    
+    ###############
+    #             #
+    # Monitoring  #
+    #             #
+    ###############
+    http: 8222
+    server_name: $POD_NAME
+---
+# Source: stan/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nats
+  namespace: nats
+  labels:
+    app: nats
+    chart: stan-0.8.0
+spec:
+  selector:
+    app: nats
+  clusterIP: None
+  ports:
+  - name: metrics
+    port: 7777
+  - name: monitor
+    port: 8222
+  - name: client
+    port: 4222
+---
+# Source: stan/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nats
+  namespace: nats
+  labels:
+    app: nats
+    chart: stan-0.8.0
+spec:
+  selector:
+    matchLabels:
+      app: nats
+
+  replicas: 1
+
+  # NATS Streaming service name
+  serviceName: nats
+
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "7777"
+        prometheus.io/scrape: "true"
+      labels:
+        app: nats
+        chart: stan-0.8.0
+    spec:
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          name: nats-config
+          defaultMode: 0755
+        name: config-volume
+
+      # Local volume shared with the reloader.
+      - name: pid
+        emptyDir: {}
+
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - nats
+            topologyKey: kubernetes.io/hostname
+      containers:
+        ####################
+        #  NATS Streaming  #
+        ####################
+        - name: stan
+          image: nats-streaming:0.22.0
+          args:
+          - -sc
+          - /etc/stan-config/stan.conf
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: CLUSTER_ADVERTISE
+            value: $(POD_NAME).nats.$(POD_NAMESPACE).svc
+          - name: STAN_SERVICE_NAME
+            value: nats
+          - name: STAN_REPLICAS
+            value: "1"
+          ports:
+          - containerPort: 8222
+            name: monitor
+          - containerPort: 7777
+            name: metrics
+          readinessProbe:
+            httpGet:
+              path: /streaming/serverz
+              port: monitor
+            timeoutSeconds: 2
+
+          volumeMounts:
+          - name: config-volume
+            mountPath: /etc/stan-config
+          - name: nats-pvc
+            mountPath: /data/stan
+          - name: pid
+            mountPath: /var/run/stan
+        #################################
+        #                               #
+        #  NATS Prometheus Exporter     #
+        #                               #
+        #################################
+        - name: metrics
+          image: natsio/prometheus-nats-exporter:latest
+          args:
+          - -connz
+          - -routez
+          - -subz
+          - -varz
+          - -channelz
+          - -serverz
+          - http://localhost:8222/
+          ports:
+          - containerPort: 7777
+            name: metrics
+  volumeClaimTemplates:
+  - metadata:
+      name: nats-pvc
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+
+NOTES:
+You can find more information about running NATS Streaming on Kubernetes
+in the NATS documentation website:
+
+  https://docs.nats.io/nats-on-kubernetes/nats-kubernetes
+
+Thanks for using NATS Streaming!

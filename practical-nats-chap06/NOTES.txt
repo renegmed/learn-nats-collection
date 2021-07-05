@@ -1,0 +1,18 @@
+Status: working
+
+Book: Practical NATS Chapter 6
+Source: https://github.com/wallyqs/practical-nats/tree/master/chapter-06/code
+
+$ cd helm
+$ make install-nats 
+$ make install-nack
+
+$ make install-api
+$ portforward-api
+
+$ make install-agent 
+$ make install-manager
+
+$ make request-suv
+$ make request-regular
+$ make request-bus

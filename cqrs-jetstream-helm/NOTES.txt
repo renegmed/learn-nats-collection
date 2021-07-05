@@ -1,0 +1,32 @@
+Status: working 
+
+Title:  Building Microservices With Go 
+Github: https://github.com/building-microservices-with-go/chapter9
+
+
+
+
+$ cd helm
+
+$ make install-nats 
+
+$ make install-nack 
+
+
+$ make install-cqrs-prodread 
+
+$ make portforward-cqrs-prodread 
+
+
+$ make install-cqrs-prodwrite
+
+$ make portforward-cqrs-prodwrite 
+
+
+$ make write1
+$ make write2 
+$ make write3 
+
+$ make get-products 
+
+

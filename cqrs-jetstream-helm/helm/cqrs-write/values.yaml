@@ -1,0 +1,17 @@
+name: product-write
+namespace: publisher
+deployment:
+  image: "renegmedal/cqrs-product-write"
+  tag: "v0.0.1"
+  replicas: 1
+  command: "/root/product-publisher"
+  port: 8080 
+  server: nats.nats.svc.cluster.local:4222  
+  streamname: PRODUCT 
+  topic: PRODUCT.inserted 
+
+service:
+  http_port: 8080
+  http_nodePort: 30020
+  
+  

@@ -1,0 +1,53 @@
+NAME: api-server
+LAST DEPLOYED: Fri Jul  2 11:29:35 2021
+NAMESPACE: default
+STATUS: pending-install
+REVISION: 1
+TEST SUITE: None
+HOOKS:
+MANIFEST:
+---
+# Source: drones-events/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name:  api-server  # this will be used by other microservices
+  namespace: trans-service
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: api-server
+  ports:
+    - name: http
+      port: 8080
+      # nodePort: 30020  #http://192.168.49.2:30020/vehicles/City%20Truck
+
+  type: ClusterIP
+  #type: NodePort
+---
+# Source: drones-events/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-server
+  namespace: trans-service
+spec:
+  selector:
+    matchLabels:
+      app: api-server
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: api-server
+    spec:
+      containers:
+      - name: api-server
+        image: renegmedal/trans-service-api:v0.0.1
+        command: [
+          "/root/api-server",
+          "-s","nats.nats.svc.cluster.local:4222",         
+          "-port","8080"]
+

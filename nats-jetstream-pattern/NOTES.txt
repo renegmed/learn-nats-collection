@@ -1,0 +1,41 @@
+Status: working
+
+Basic NATS clustered jet streaming setup
+
+$ cd helm
+$ make install-nats 
+$ make install-nack 
+ 
+$ make namespace-subscriber 
+$ make install-subscriber
+$ make install-subscriber-update 
+
+$ make namespace-publisher
+$ make install-publisher 
+$ make portforward-publisher 
+
+$ make uninstall 
+$ make remove-ns 
+
+
+$ make order1
+
+order1:
+	curl -XPOST http://localhost:9090/publish -d '{"topic":"ORDER.created","message":"order 1001"}'
+
+$ make order2
+
+order2:
+	curl -XPOST http://localhost:9090/publish -d '{"topic":"ORDER.created","message":"order 2001"}'
+
+$ make order3 
+
+order3:
+	curl -XPOST http://localhost:9090/publish -d '{"topic":"ORDER.update","message":"order 30001"}'	
+
+$ make order4
+
+order4:
+	curl -XPOST http://localhost:9090/publish -d '{"topic":"ORDER.update","message":"order 11001"}'	
+
+

@@ -1,0 +1,14 @@
+name: api-server
+namespace: trans-service
+deployment:
+  image: "renegmedal/trans-service-api"
+  tag: "v0.0.1"
+  replicas: 1
+  command: "/root/api-server"   
+  server: nats.nats.svc.cluster.local:4222
+  port: 8080
+service:
+  http_port: 8080
+  http_nodePort: 30020
+  
+  

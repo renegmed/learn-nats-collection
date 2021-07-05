@@ -1,0 +1,17 @@
+name: product-read
+namespace: subscriber
+deployment:
+  image: "renegmedal/cqrs-product-read"
+  tag: "v0.0.1"
+  replicas: 1
+  command: "/root/product-reader"
+  port: 8080 
+  server: nats.nats.svc.cluster.local:4222  
+  durablename: dur-reader 
+  topic: PRODUCT.inserted 
+
+service:
+  http_port: 8080
+  http_nodePort: 30020
+  
+  

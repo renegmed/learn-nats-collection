@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  namespace: publisher
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+      - name: {{ .Values.name }}
+        image: {{ .Values.deployment.image }}:{{ .Values.deployment.tag }}
+        command: [
+          "{{ .Values.deployment.command}}",
+          "-s","{{ .Values.deployment.server }}",
+          "-streamname","{{ .Values.deployment.streamname }}",
+          "-topic","{{ .Values.deployment.topic }}",
+          "-port","{{ .Values.deployment.port }}"]
+        

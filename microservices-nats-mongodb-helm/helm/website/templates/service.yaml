@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.name }}  # this will be used by other microservices
+  namespace: {{ .Values.namespace }}
+
+spec:
+  # This defines which pods are going to be represented by this Service
+  # The service becomes a network endpoint for either other services
+  # or maybe external users to connect to (eg browser)
+  selector:
+    app: {{ .Values.name }}
+  ports:
+    - name: http
+      port: {{ .Values.service.http_port}}
+      # nodePort: {{ .Values.service.http_nodePort}}  #http://192.168.49.2:30020/vehicles/City%20Truck
+
+  type: ClusterIP
+  #type: NodePort

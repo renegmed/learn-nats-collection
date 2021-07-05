@@ -1,0 +1,26 @@
+Status: working  
+
+Article: Building Distributed Event Streaming Systems In Go With NATS JetStream
+URL: https://shijuvar.medium.com/building-distributed-event-streaming-systems-in-go-with-nats-jetstream-3938e6dc7a13
+
+
+$ cd helm
+
+$ make install-nats 
+$ make install-nack 
+$ make portforward 
+
+
+$ cd monitor 
+$ make run 
+
+$ cd order-review 
+$ make run 
+
+$ cd order-new 
+$ make run 
+
+ERROR: (sporadic)
+
+    nats: jetstream not enabled
+ 

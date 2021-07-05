@@ -1,0 +1,25 @@
+Status: working 
+
+Title: Microservices - Example with Docker, Go and MongoDB
+URL: https://mmorejon.io/en/blog/microservices-example-with-docker-go-and-mongodb/
+Github: https://github.com/mmorejon/microservices-docker-go-mongodb.git
+ 
+cd helm
+$ make install-nats 
+$ make install-nack 
+
+$ make install-mongodb-bookings 
+$ make install-bookings 
+
+$ make install-mongodb-users 
+$ make install-users 
+
+$ make install-mongodb-movies 
+$ make install-movies 
+
+$ make install-mongodb-showtimes 
+$ make install-showtimes 
+
+$ make install-website
+$ make portforward-website 
+

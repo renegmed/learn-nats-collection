@@ -1,0 +1,17 @@
+name: subscriber
+deployment:
+  image: "renegmedal/js-pattern-subscriber"
+  tag: "0.1.0"
+  replicas: 1
+  command: "/subscriber" 
+  server: nats.nats.svc.cluster.local:4222   
+  topic: ORDER.created
+  durablename: dur-create
+
+  # ./subscriber -s nats://localhost:4222 -topic ORDER.created -durablename dur-sub
+
+service:
+  http_port: 8080
+#   http_nodePort: 30020
+  
+  

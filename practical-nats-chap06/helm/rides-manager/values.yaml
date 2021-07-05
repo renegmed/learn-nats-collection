@@ -1,0 +1,13 @@
+name: rides-manager
+namespace: trans-service
+deployment:
+  image: "renegmedal/trans-service-manager"
+  tag: "v0.0.1"
+  replicas: 1
+  command: "/root/rides-manager"   
+  server: nats.nats.svc.cluster.local:4222  
+service:
+  http_port: 8080
+  http_nodePort: 30020
+  
+  

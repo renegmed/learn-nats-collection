@@ -1,0 +1,17 @@
+Status: working 
+
+https://github.com/nats-io/nats.go/tree/master/examples/nats-req
+https://github.com/nats-io/nats.go/tree/master/examples/nats-rply
+
+$ cd helm 
+$ make install-nats 
+$ make install-stan 
+$ make portforward 
+
+$ cd qsub
+$ make run 
+
+
+$ cd qpub
+$ make run 
+

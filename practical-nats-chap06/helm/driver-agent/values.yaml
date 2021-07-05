@@ -1,0 +1,13 @@
+name: driver-agent
+namespace: trans-service
+deployment:
+  image: "renegmedal/trans-service-agent"
+  tag: "v0.0.1"
+  replicas: 1
+  command: "/root/driver-agent"   
+  server: nats.nats.svc.cluster.local:4222  
+service:
+  http_port: 8080
+  http_nodePort: 30020
+  
+  

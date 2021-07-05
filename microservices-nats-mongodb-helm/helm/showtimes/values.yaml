@@ -1,0 +1,19 @@
+name: showtimes
+namespace: showtimes
+deployment:
+  image: "renegmedal/cinema-nats-showtimes"
+  tag: "latest"
+  replicas: 1
+  command: "/showtimes"
+  serveraddr: localhost:8080
+  mongouri:  mongodb://showtimes-mongodb.showtimes.svc.cluster.local:27017 
+  enablecredentials: false
+  natsaddr: nats.nats.svc.cluster.local:4222
+  topic: SHOWTIMES
+  queuename: qshowtimes 
+
+service:
+  http_port: 8080
+  http_nodePort: 30020
+  
+  

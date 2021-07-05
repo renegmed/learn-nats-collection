@@ -1,0 +1,32 @@
+FROM golang:1.16.5-alpine AS builder
+# create appuser.
+# RUN adduser -D -g '' elf
+# create workspace
+WORKDIR /app
+COPY go.mod .
+COPY go.sum .
+COPY cmd cmd/
+COPY pkg pkg/
+
+# fetch dependancies
+RUN go mod download
+# RUN go mod verify
+
+RUN pwd 
+RUN ls -als
+
+# build binary
+# RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -a -installsuffix cgo -o /go/bin/cinema-bookings ./cmd/app
+RUN go build -o showtimes cmd/app/*.go
+
+
+# build a small image
+FROM alpine:latest
+LABEL language="golang"
+RUN apk --no-cache add ca-certificates
+ 
+WORKDIR /
+COPY --from=builder /app/showtimes .
+
+ENTRYPOINT ["./showtimes"]
+ 

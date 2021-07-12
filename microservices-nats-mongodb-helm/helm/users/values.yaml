@@ -5,8 +5,7 @@ deployment:
   tag: "latest"
   replicas: 1
   command: "/users"
-  serveraddr: localhost:8080
-  # mongouri: mongodb://users-mongodb:4222 
+  serveraddr: ":8080"
   mongouri: mongodb://users-mongodb.users.svc.cluster.local:27017 
   enablecredentials: false
   natsaddr: nats.nats.svc.cluster.local:4222

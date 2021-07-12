@@ -209,6 +209,9 @@ upgrade-users:
 uninstall-users:
 	helm uninstall users 
 
+portforward-users:
+	kubectl port-forward --namespace users svc/users 8080:8080
+
 
 #-------- website ----------
  
@@ -233,4 +236,46 @@ delete-namespace-website:
 portforward-website:
 	kubectl port-forward --namespace website svc/website 8080:8080
 
- 
+# ------------ ingress website -------------
+
+dryrun-ingress-website: 
+	helm install ingress-website ingress-website -f ingress-website/values.yaml --dry-run > test-ingress-website.yaml
+
+install-ingress-website:
+	helm install ingress-website ingress-website -f ingress-website/values.yaml
+
+upgrade-ingress-website:
+	helm upgrade ingress-website ingress-website -f ingress-website/values.yaml
+
+uninstall-ingress-website:
+	helm uninstall ingress-website 
+
+# ------------ ingress users -------------
+
+
+dryrun-ingress-users: 
+	helm install ingress-users ingress-users -f ingress-users/values.yaml --dry-run > test-ingress-users.yaml
+
+install-ingress-users:
+	helm install ingress-users ingress-users -f ingress-users/values.yaml
+
+upgrade-ingress-users:
+	helm upgrade ingress-users ingress-users -f ingress-users/values.yaml
+
+uninstall-ingress-users:
+	helm uninstall ingress-users
+
+
+# ------------ test ------------
+
+list-users: 
+	curl http://192.168.49.2/api/users/ -v
+
+post-user1:
+	curl -XPOST http://192.168.49.2/api/users/ -d '{"name":"John","lastname":"Doe"}' -v 
+
+post-user2:
+	curl -XPOST http://192.168.49.2/api/users/ -d '{"name":"Jane","lastname":"Denali"}'  
+
+post-user3:
+	curl -XPOST http://192.168.49.2/api/users/ -d '{"name":"Peter","lastname":"Ducker"}'  

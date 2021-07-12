@@ -10,10 +10,12 @@ spec:
   # or maybe external users to connect to (eg browser)
   selector:
     app: {{ .Values.name }}
+  # ports:
+  #   - name: http
+  #     port: {{ .Values.service.http_port}}
+  #     # nodePort: {{ .Values.service.http_nodePort}}  #http://192.168.49.2:30020/vehicles/City%20Truck
   ports:
-    - name: http
-      port: {{ .Values.service.http_port}}
-      # nodePort: {{ .Values.service.http_nodePort}}  #http://192.168.49.2:30020/vehicles/City%20Truck
-
+    - targetPort: {{ .Values.service.http_port }}
+      port: 8080
   type: ClusterIP
   #type: NodePort

@@ -5,7 +5,7 @@ deployment:
   tag: "latest"
   replicas: 1
   command: "/movies"
-  serveraddr: localhost:8080
+  serveraddr: ":8080"
   mongouri: mongodb://movies-mongodb.movies.svc.cluster.local:27017 
   enablecredentials: false 
   natsaddr: nats.nats.svc.cluster.local:4222

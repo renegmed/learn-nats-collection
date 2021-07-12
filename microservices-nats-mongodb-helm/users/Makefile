@@ -16,7 +16,8 @@ push:
 
 
 get-all:
-	curl localhost:7000/api/users/ -v
+	#curl localhost:7000/api/users/ -v
+	curl 192.168.49.2/api/users/ -v
 
 post1:
 	curl -XPOST localhost:7000/api/users/ -d '{"name":"John","lastname":"Doe"}' -v 

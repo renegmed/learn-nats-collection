@@ -23,4 +23,6 @@ spec:
           "-movies={{ .Values.deployment.moviestopic }}",
           "-showtimes={{ .Values.deployment.showtimestopic }}",
           "-bookings={{ .Values.deployment.bookingstopic }}"]
+        ports:
+          - containerPort: {{ .Values.service.http_port }}
  

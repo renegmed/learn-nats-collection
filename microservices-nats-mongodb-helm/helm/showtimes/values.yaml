@@ -5,7 +5,7 @@ deployment:
   tag: "latest"
   replicas: 1
   command: "/showtimes"
-  serveraddr: localhost:8080
+  serveraddr: ":8080"
   mongouri:  mongodb://showtimes-mongodb.showtimes.svc.cluster.local:27017 
   enablecredentials: false
   natsaddr: nats.nats.svc.cluster.local:4222

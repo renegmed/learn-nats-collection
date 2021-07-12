@@ -4,8 +4,8 @@ deployment:
   image: "renegmedal/cinema-nats-website"
   tag: "latest"
   replicas: 1
-  command: "/website"
-  serveraddr: localhost:8080
+  command: "/website" 
+  serveraddr: ":8080"
   natsaddr: nats.nats.svc.cluster.local:4222
   userstopic: USERS 
   moviestopic: MOVIES 

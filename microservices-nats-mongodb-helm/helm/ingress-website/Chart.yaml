@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ticketing-website-ingress
+description: Ticketing website ingress   
+type: application 
+version: 0.1.0 
+appVersion: 1.1.0

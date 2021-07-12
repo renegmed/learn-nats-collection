@@ -23,3 +23,17 @@ $ make install-showtimes
 $ make install-website
 $ make portforward-website 
 
+
+$ make install-ingress-website 
+
+or 
+
+$ make install-ingress-users
+
+NOTE: you cannot install ingress both website and users at the same time 
+
+    $ make install-ingress-users 
+    helm install ingress-users ingress-users -f ingress-users/values.yaml
+    Error: cannot re-use a name that is still in use
+    make: *** [Makefile:261: install-ingress-users] Error 1
+

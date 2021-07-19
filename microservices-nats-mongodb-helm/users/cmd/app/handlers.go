@@ -97,14 +97,6 @@ func (app *application) insert(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 	}
 
-	// // Insert new user
-	// insertResult, err := app.users.Insert(u)
-	// if err != nil {
-	// 	app.serverError(w, err)
-	// }
-
-	// app.infoLog.Printf("New user have been created, id=%s", insertResult.InsertedID)
-
 	err = app.insertUser(u)
 	if err != nil {
 		app.serverError(w, err)

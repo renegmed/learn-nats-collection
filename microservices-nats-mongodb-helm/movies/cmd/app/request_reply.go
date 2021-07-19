@@ -52,3 +52,17 @@ func (app *application) reply_moviesByIDs(IDs string) ([]byte, error) { // a str
 	app.infoLog.Printf("...reply_moviesByIDs movies:\n\t%v", string(bMovies))
 	return bMovies, nil
 }
+
+func (app *application) reply_addMovie(movie string) error {
+	var m models.Movie
+	err := json.Unmarshal([]byte(movie), &m)
+	if err != nil {
+		return err
+	}
+	return app.insertMovie(m)
+}
+
+func (app *application) reply_deleteMovie(movieId string) error {
+
+	return app.deleteMovie(movieId)
+}

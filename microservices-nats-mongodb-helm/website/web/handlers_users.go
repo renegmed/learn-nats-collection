@@ -171,23 +171,3 @@ func (app *Application) usersDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error - request NATS connection", 500)
 	}
 }
-
-// func (app *Application) usersDelete(id string) (*models.User, error) {
-// 	var user models.User
-
-// 	subj := app.Requests.Users + ".delete"
-// 	payload := id
-// 	msg, err := app.Conn.Request(subj, []byte(payload), 2*time.Second)
-// 	if err != nil {
-// 		return &user, err
-// 	}
-
-// 	app.InfoLog.Println("...handlers_users delete user\n\t", string(msg.Data))
-
-// 	err = json.Unmarshal(msg.Data, &user)
-// 	if err != nil {
-// 		return &user, err
-// 	}
-
-// 	return &user, nil
-// }

@@ -128,3 +128,41 @@ func (app *Application) getMovieByID(id string) (*models.Movie, error) {
 
 	return &movie, nil
 }
+
+func (app *Application) moviesAdd(w http.ResponseWriter, r *http.Request) {
+	var movie models.Movie
+
+	err := json.NewDecoder(r.Body).Decode(&movie)
+	if err != nil {
+		http.Error(w, "Internal Server Error - decoding movie", 500)
+	}
+
+	app.InfoLog.Println("...movie to add:\n", movie)
+
+	mve, err := json.Marshal(movie)
+	if err != nil {
+		http.Error(w, "Internal Server Error - marshal movie", 500)
+	}
+
+	subj := app.Requests.Movies + ".add"
+
+	_, err = app.Conn.Request(subj, mve, 2*time.Second)
+	if err != nil {
+		http.Error(w, "Internal Server Error - request NATS connection", 500)
+	}
+
+}
+
+func (app *Application) moviesDelete(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	movieID := vars["id"]
+
+	app.InfoLog.Println("...movie to delete:", movieID)
+
+	subj := app.Requests.Movies + ".delete"
+	_, err := app.Conn.Request(subj, []byte(movieID), 2*time.Second)
+	if err != nil {
+		http.Error(w, "Internal Server Error - request NATS connection", 500)
+	}
+}

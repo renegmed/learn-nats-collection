@@ -130,6 +130,29 @@ func main() {
 		app.errorLog.Println("...Error from reply get movies by IDs,", err)
 	})
 
+	nconn.QueueSubscribe(*topic+".add", *queueName+"_add", func(msg *nats.Msg) {
+
+		infoLog.Println("...QueueSubscribe called - topic", *topic+".add")
+		app.infoLog.Printf("...Subject: %s  Data: %s", msg.Subject, string(msg.Data))
+		err := app.reply_addMovie(string(msg.Data))
+		if err == nil {
+			return
+		}
+
+		app.errorLog.Println("...Error from reply add movie,", err)
+	})
+
+	nconn.QueueSubscribe(*topic+".delete", *queueName+"_delete", func(msg *nats.Msg) {
+
+		infoLog.Println("...QueueSubscribe called - topic", *topic+".delete")
+		app.infoLog.Printf("...Subject: %s  Data: %s", msg.Subject, string(msg.Data))
+		err := app.reply_deleteMovie(string(msg.Data))
+		if err == nil {
+			return
+		}
+
+		app.errorLog.Println("...Error from reply delete movie,", err)
+	})
 	nconn.Flush()
 
 	if err := nconn.LastError(); err != nil {

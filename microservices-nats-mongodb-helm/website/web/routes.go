@@ -15,6 +15,8 @@ func (app *Application) Routes() *mux.Router {
 
 	r.HandleFunc("/movies/list", app.moviesList)
 	r.HandleFunc("/movies/view/{id}", app.moviesView)
+	r.HandleFunc("/movies/add", app.moviesAdd)
+	r.HandleFunc("/movies/delete/{id}", app.moviesDelete)
 	r.HandleFunc("/showtimes/list", app.showtimesList)
 	r.HandleFunc("/showtimes/view/{id}", app.showtimesView)
 	r.HandleFunc("/bookings/list", app.bookingsList)

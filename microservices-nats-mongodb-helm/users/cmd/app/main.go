@@ -137,7 +137,7 @@ func main() {
 			return
 		}
 
-		app.errorLog.Println("...Error from reply add user,", err)
+		app.errorLog.Println("...Error from reply delete user,", err)
 	})
 
 	nconn.Flush()

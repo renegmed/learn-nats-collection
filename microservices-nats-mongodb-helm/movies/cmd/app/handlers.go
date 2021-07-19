@@ -99,14 +99,23 @@ func (app *application) insert(w http.ResponseWriter, r *http.Request) {
 
 	app.infoLog.Println("...movie to insert:\n", m)
 
-	// Insert new movie
-	insertResult, err := app.movies.Insert(m)
+	app.insertMovie(m)
+
+}
+
+func (app *application) insertMovie(movie models.Movie) error {
+
+	app.infoLog.Println("...movie to insert:\n", movie)
+
+	insertResult, err := app.movies.Insert(movie)
 	if err != nil {
 		app.infoLog.Println("...error on insert() data access,", err)
-		app.serverError(w, err)
+		return err
 	}
 
 	app.infoLog.Printf("...New movie have been created, id=%s", insertResult.InsertedID)
+
+	return nil
 }
 
 func (app *application) delete(w http.ResponseWriter, r *http.Request) {
@@ -116,12 +125,22 @@ func (app *application) delete(w http.ResponseWriter, r *http.Request) {
 
 	app.infoLog.Println("...movie to delete:", id)
 
+	app.deleteMovie(id)
+
+}
+
+func (app *application) deleteMovie(movieId string) error {
+
+	app.infoLog.Println("...movie to delete:\n", movieId)
+
 	// Delete movie by id
-	deleteResult, err := app.movies.Delete(id)
+	deleteResult, err := app.movies.Delete(movieId)
 	if err != nil {
 		app.infoLog.Println("...error on delete() data access,", err)
-		app.serverError(w, err)
+		return err
 	}
 
 	app.infoLog.Printf("...Have been eliminated %d movie(s)", deleteResult.DeletedCount)
+
+	return nil
 }

@@ -6,7 +6,7 @@ build:
 	go build -race -o website main.go
 
 run: build
-	./website -serveraddr=localhost:8080 -s nats://localhost:4222 -users USERS -movies MOVIES -showtimes SHOWTIMES -bookings BOOKINGS
+	./website -serveraddr=:8080 -s nats://localhost:4222 -users USERS -movies MOVIES -showtimes SHOWTIMES -bookings BOOKINGS
 
 
 up:

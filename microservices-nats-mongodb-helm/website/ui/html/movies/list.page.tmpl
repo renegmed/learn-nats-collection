@@ -4,17 +4,30 @@
 
 <div class="album py-5 bg-light">
     <div class="container">
-
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newMovieModal">
+            Add New Movie
+        </button>
         <div class="row">
             {{range .Movies}}
             <div class="col-md-3">
                 <div class="card mb-3 shadow-sm">
                     <div class="card-body">
+                        <span style="visibility:hidden;"> 
+                          <data class="movie-id">{{.ID.Hex}}</data>
+                          <data class="movie-title">{{.Title}}</data>
+                          <data class="movie-director">{{.Director}}</data>
+                          <data class="movie-rating">{{.Rating}}</data>
+                        </span>
                         <p class="card-text">{{.Title}}</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <a class="btn btn-sm btn-outline-secondary" href="/movies/view/{{.ID.Hex}}" role="button">View</a>
-                            </div>
+                            <div class="btn-group">                               
+                                <button type="button" class="view-movie btn btn-primary" data-toggle="modal" data-target="#viewMovieModal">
+                                  View
+                                </button>
+                                <button type="button" class="delete-movie btn btn-primary" data-toggle="modal" data-target="#deleteMovieModal">
+                                    Delete
+                                </button>                             
+                            </div>      
                         </div>
                     </div>
                 </div>
@@ -25,4 +38,243 @@
     </div>
 </div>
 
+
+<!-- Add Movie Modal -->
+<div class="modal fade" id="newMovieModal" tabindex="-1" role="dialog" aria-labelledby="newMovieModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newMovieModal">New Movie</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form>
+        <div class="modal-body">      
+          <div class="form-group">
+              <label for="usr">Title:</label>
+              <input type="text" class="input-title form-control">
+          </div>
+          <div class="form-group">
+              <label for="pwd">Director:</label>
+              <input type="text" class="input-director form-control">
+          </div> 
+          <div class="form-group">
+              <label for="rtg">Rating:</label>
+              <input type="text" class="input-rating form-control">
+          </div> 
+        </div>
+     
+        <div class="modal-footer">
+          <button type="submit" class="add-movie-cancel btn btn-secondary" data-dismiss="modal" value="cancel" >Cancel</button>
+          <button type="submit" class="add-movie-save btn btn-primary" value="save">Save</button>
+        </div>
+ 
+       </form>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- View Movie Modal -->
+<div class="modal fade" id="viewMovieModal" tabindex="-1" role="dialog" aria-labelledby="viewMovieModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewMovieModal">View Movie</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form>
+        <div class="modal-body">          
+          <div class="form-group">
+              <label for="usr" id="view-movieid">ID:</label>             
+          </div>     
+          <div class="form-group">
+              <label for="usr"id="view-title">Title:</label>             
+          </div>
+          <div class="form-group">
+              <label for="pwd" id="view-director">Director:</label>              
+          </div> 
+          <div class="form-group">
+              <label for="rtg" id="view-rating">Rating:</label>              
+          </div> 
+        </div>
+     
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-secondary" data-dismiss="modal" value="Close" id="view-movie-cancel">Close</button>        
+      </div>
+
+       </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Delete Movie Modal -->
+<div class="modal fade" id="deleteMovieModal" tabindex="-1" role="dialog" aria-labelledby="deleteMovieModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteMovieModal">Delete Movie</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form>
+         <div class="modal-body"> 
+            <div class="data-movie-id" style="visibility:hidden"></div>
+            <div class="form-group">
+                 <label for="usr" id="delete-movieid">ID:</label>             
+            </div>     
+            <div class="form-group">
+                 <label for="usr"id="delete-title">Title:</label>             
+            </div>
+            <div class="form-group">
+                 <label for="pwd" id="delete-director">Director:</label>              
+            </div> 
+             <div class="form-group">
+                 <label for="rtg" id="delete-director">Rating:</label>              
+            </div> 
+         </div>         
+
+         <div class="modal-footer">
+           <button type="submit" class="delete-movie-cancel btn btn-secondary" data-dismiss="modal" value="Cancel" >Cancel</button>
+           <button type="submit" class="delete-movie-delete btn btn-primary" value="Save">Delete</button>
+         </div>
+
+       </form>
+
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  
+  $(document).ready(function(){
+    
+    $(".add-movie-save").click(function (event) {
+        console.log("...Add movie save");
+        var title = $(this).parents("form").find(".input-title").val();
+		var director = $(this).parents("form").find(".input-director").val();
+        var rating = $(this).parents("form").find(".input-rating").val();
+        
+        console.log("...title:",title);
+        console.log("...director:",director); 
+        console.log("...rating:",rating);
+
+         // Creating a XHR object
+        let xhr = new XMLHttpRequest();
+        let url = "http://localhost:8080/movies/add";
+    
+        // open a connection
+        xhr.open("POST", url, true);
+        
+        // Set the request header i.e. which type of content you are sending
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        // Create a state change callback
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {       // && xhr.status === 200) {
+                // Print received data from server
+                console.log("...xhr status: ", xhr.status);
+                console.log("...xhr response text: ", xhr.responseText);
+                alert("Status:" + xhr.status + "  Response: " + xhr.responseText);
+            }
+        }; 
+
+        // Converting JSON data to string        
+        var data = `
+           { 
+             "title": "` + title +`", 
+             "director": "` + director +`", 
+             "rating": ` + rating + ` 
+           }
+        `   
+        // Sending data with the request
+
+        console.log("...JSON data to send:\n", data);
+
+        //alert(data);
+
+        xhr.send(data);    
+      
+    });
+  
+    $(".add-movie-cancel").click(function (event) {
+        console.log("...Add movie cancel");
+
+    });
+  
+   
+    $(".view-movie").click(function (event) {
+        console.log("...View movie");
+        var movieid = $(this).parents(".card").find(".movie-id").text();
+		var title = $(this).parents(".card").find(".movie-title").text();
+		var director = $(this).parents(".card").find(".movie-director").text();
+        var rating = $(this).parents(".card").find(".movie-rating").text();
+
+        console.log("... title:", title);
+
+        $("#data-movieid").text(movieid);
+        $("#view-movieid").text("ID: " + movieid);
+        $("#view-title").text("Title: " + title);
+        $("#view-director").text("Director: " + director);
+        $("#view-rating").text("Rating: " + rating);
+
+    });
+
+    $(".delete-movie").click(function (event) {
+        console.log("...Delete movie");
+        
+        var movieid = $(this).parents(".card").find(".movie-id").text();
+		var title = $(this).parents(".card").find(".movie-title").text();
+		var director = $(this).parents(".card").find(".movie-director").text();
+        var rating = $(this).parents(".card").find(".movie-rating").text();
+
+        console.log("... title:", title);
+
+        $(".data-movie-id").text(movieid);
+        $("#delete-movieid").text("ID: " + movieid);
+        $("#delete-title").text("Title: " + title);
+        $("#delete-director").text("Director: " + director); 
+        $("#delete-rating").text("Rating: " + rating); 
+    });
+
+ 
+ 
+    $(".delete-movie-delete").click(function (event) {
+ 
+        var movieid = $(this).parents("form").find(".data-movie-id").text();
+		     
+        console.log("... movie id:", movieid); 
+        
+         // Creating a XHR object
+        let xhr = new XMLHttpRequest();
+        let url = "http://localhost:8080/movies/delete/"+movieid;
+    
+        // open a connection
+        xhr.open("POST", url, true); 
+         
+        // Create a state change callback
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Print received data from server
+                console.log("...xhr status: ", xhr.status);
+                console.log("...xhr response text: ", xhr.responseText);
+                alert("Status:" + xhr.status + "  Response: " + xhr.responseText);
+            }
+        };
+     
+        xhr.send();     
+    });
+
+  });   
+ 
+</script>
 {{end}}

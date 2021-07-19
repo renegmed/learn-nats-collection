@@ -2,8 +2,7 @@
 repo-mongodb:
 	helm repo add bitnami https://charts.bitnami.com/bitnami
 
-create-namespace-nats:
-	kubectl create ns nats 
+
 
 namespace-bookings:
 	kubectl create ns bookings 
@@ -15,6 +14,9 @@ uninstall-all:	uninstall-mongodb-showtimes uninstall-mongodb-bookings uninstall-
 	uninstall-website uninstall-showtimes uninstall-bookings uninstall-movies uninstall-nack uninstall-nack
 
 # ----------- nats and nack ------------------
+
+namespace-nats:
+	kubectl create ns nats 
 
 dryrun-nats:
 	helm install nats nats --values nats/values.yaml --set nats.image=synadia/nats-server:nightly --set=nats.jetstream.enabled=true --dry-run > test-nats.yaml 
@@ -210,7 +212,7 @@ uninstall-users:
 	helm uninstall users 
 
 portforward-users:
-	kubectl port-forward --namespace users svc/users 8080:8080
+	kubectl port-forward --namespace users svc/users 8282:8080
 
 
 #-------- website ----------

@@ -116,6 +116,30 @@ func main() {
 		app.errorLog.Println("...Error from reply get user,", err)
 	})
 
+	nconn.QueueSubscribe(*topic+".add", *queueName+"_add", func(msg *nats.Msg) {
+
+		infoLog.Println("...QueueSubscribe called - topic", *topic+".add")
+		app.infoLog.Printf("...Subject: %s  Data: %s", msg.Subject, string(msg.Data))
+		err := app.reply_addUser(string(msg.Data))
+		if err == nil {
+			return
+		}
+
+		app.errorLog.Println("...Error from reply add user,", err)
+	})
+
+	nconn.QueueSubscribe(*topic+".delete", *queueName+"_delete", func(msg *nats.Msg) {
+
+		infoLog.Println("...QueueSubscribe called - topic", *topic+".delete")
+		app.infoLog.Printf("...Subject: %s  Data: %s", msg.Subject, string(msg.Data))
+		err := app.reply_deleteUser(string(msg.Data))
+		if err == nil {
+			return
+		}
+
+		app.errorLog.Println("...Error from reply add user,", err)
+	})
+
 	nconn.Flush()
 
 	if err := nconn.LastError(); err != nil {

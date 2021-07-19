@@ -20,3 +20,19 @@ build-docker:
 
 push:
 	docker push renegmedal/cinema-nats-website:latest
+
+
+#  
+# $ make install-nats
+# $ make install-nack
+# $ make portforward-nats
+# 
+# $ make install-mongo-users
+# $ make portforward-mongo-users
+# $ cd users 
+# $ make run
+#
+# $ cd website
+# $ make run
+
+# http://localhost:8080 

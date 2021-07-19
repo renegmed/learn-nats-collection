@@ -4,6 +4,13 @@ Title: Microservices - Example with Docker, Go and MongoDB
 URL: https://mmorejon.io/en/blog/microservices-example-with-docker-go-and-mongodb/
 Github: https://github.com/mmorejon/microservices-docker-go-mongodb.git
  
+Title:   A simple CRUD application with Javascript
+URL: https://medium.com/@etiennerouzeaud/a-simple-crud-application-with-javascript-ebc82f688c59
+
+
+$ minikube addons enable ingress 
+
+
 cd helm
 $ make install-nats 
 $ make install-nack 
@@ -24,6 +31,8 @@ $ make install-website
 $ make portforward-website 
 
 
+$ 
+
 $ make install-ingress-website 
 
 or 
@@ -37,3 +46,4 @@ NOTE: you cannot install ingress both website and users at the same time
     Error: cannot re-use a name that is still in use
     make: *** [Makefile:261: install-ingress-users] Error 1
 
+ 

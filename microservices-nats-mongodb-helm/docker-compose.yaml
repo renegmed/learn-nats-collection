@@ -1,0 +1,153 @@
+version: "3.8"
+services:   
+#   n1:
+#     container_name: n1
+#     image: synadia/jsm:nightly
+#     entrypoint: /nats-server
+#     command: "--config /config/jetstream.conf --server_name S1"
+#     # networks:
+#     #   - nats
+#     ports:
+#       - 4222:4222
+#     volumes:
+#       - ./nats/config:/config
+#       - ./nats/persistent-data/server-n1/:/data/nats-server/jetstream
+
+#   n2:
+#     container_name: n2
+#     image: synadia/jsm:nightly
+#     entrypoint: /nats-server
+#     command: "--config /config/jetstream.conf --server_name S2"
+#     # networks:
+#     #   - nats
+#     ports:
+#       - 4223:4222
+#     volumes:
+#       - ./nats/config:/config
+#       - ./nats/persistent-data/server-n2/:/data/nats-server/jetstream
+
+#   n3:
+#     container_name: n3
+#     image: synadia/jsm:nightly
+#     entrypoint: /nats-server
+#     command: "--config /config/jetstream.conf --server_name S3"
+#     # networks:
+#     #   - nats
+#     ports:
+#       - 4224:4222
+#     volumes:
+#       - ./nats/config:/config
+#       - ./nats/persistent-data/server-n3/:/data/nats-server/jetstream
+
+  website:
+    container_name: website
+    build: ./website
+    #image: ghcr.io/mmorejon/cinema-website:v2.1.0
+    image: renegmedal/cinema-website:latest
+    ports:
+        - 8080:8080
+    command:
+      #- -serveraddr localhost:8080 -s nats://localhost:4222 -users USERS -movies MOVIES -showtimes SHOWTIMES -bookings BOOKINGS
+      - -serveraddr 
+      - :8080
+      - -s 
+      - nats://localhost:4222  
+      - -users 
+      - USERS 
+      - -movies 
+      - MOVIES 
+      - -showtimes 
+      - SHOWTIMES 
+      - -bookings 
+      - BOOKINGS
+    # command:
+    #   - "-usersAPI"
+    #   - "http://users:4000/api/users/"
+    #   - "-moviesAPI"
+    #   - "http://movies:4000/api/movies/"
+    #   - "-showtimesAPI"
+    #   - "http://showtimes:4000/api/showtimes/"
+    #   - "-bookingsAPI"
+    #   - "http://bookings:4000/api/bookings/"
+    # labels:
+    #   # Enable public access
+    #   - "traefik.http.routers.website.rule=PathPrefix(`/`)"
+    #   - "traefik.http.services.website.loadbalancer.server.port=8000"
+
+#   movies:
+#     # build: ./movies
+#     image: ghcr.io/mmorejon/cinema-movies:v2.1.0
+#     command:
+#       - "-mongoURI"
+#       - "mongodb://db:27017/"
+#     #   - "-enableCredentials"
+#     #   - "true"
+#     # environment:
+#     #   MONGODB_USERNAME: "demo"
+#     #   MONGODB_PASSWORD: "e3LBVTPdlzxYbxt9"
+#     labels: {}
+#       # Enable public access
+#       # - "traefik.http.routers.movies.rule=PathPrefix(`/api/movies/`)"
+#       # - "traefik.http.services.movies.loadbalancer.server.port=4000"
+#       # Apply middlewares
+#       # - "traefik.http.routers.movies.middlewares=my-header,my-compress"
+
+#   bookings:
+#     # build: ./bookings
+#     image: ghcr.io/mmorejon/cinema-bookings:v2.1.0
+#     command:
+#       - "-mongoURI"
+#       - "mongodb://db:27017/"
+#     #   - "-enableCredentials"
+#     #   - "true"
+#     # environment:
+#     #   MONGODB_USERNAME: "demo"
+#     #   MONGODB_PASSWORD: "e3LBVTPdlzxYbxt9"
+#     labels: {}
+#       # Enable public access
+#       # - "traefik.http.routers.bookings.rule=PathPrefix(`/api/bookings/`)"
+#       # - "traefik.http.services.bookings.loadbalancer.server.port=4000"
+
+#   showtimes:
+#     # build: ./showtimes
+#     image: ghcr.io/mmorejon/cinema-showtimes:v2.1.0
+#     command:
+#       - "-mongoURI"
+#       - "mongodb://db:27017/"
+#     #   - "-enableCredentials"
+#     #   - "true"
+#     # environment:
+#     #   MONGODB_USERNAME: "demo"
+#     #   MONGODB_PASSWORD: "e3LBVTPdlzxYbxt9"
+#     labels: {}
+#       # Enable public access
+#       # - "traefik.http.routers.showtimes.rule=PathPrefix(`/api/showtimes/`)"
+#       # - "traefik.http.services.showtimes.loadbalancer.server.port=4000"
+
+#   users:
+#     # build: ./users
+#     image: ghcr.io/mmorejon/cinema-users:v2.1.0
+#     command:
+#       - "-mongoURI"
+#       - "mongodb://db:27017/"
+#     #   - "-enableCredentials"
+#     #   - "true"
+#     # environment:
+#     #   MONGODB_USERNAME: "demo"
+#     #   MONGODB_PASSWORD: "e3LBVTPdlzxYbxt9"
+#     labels: {}
+#       # Enable public access
+#       # - "traefik.http.routers.users.rule=PathPrefix(`/api/users/`)"
+#       # - "traefik.http.services.users.loadbalancer.server.port=4000"
+
+#   db:
+#     image: mongo:4.2.11
+#     # ports:
+#     #   - target: 27017
+#     #     published: 27017
+#     #     protocol: tcp
+#     #     mode: host
+#     volumes:
+#       - type: bind
+#         source: ./backup
+#         target: /backup

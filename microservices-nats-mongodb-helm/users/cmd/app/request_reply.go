@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cinema-app/users/pkg/models"
 	"encoding/json"
 )
 
@@ -28,4 +29,18 @@ func (app *application) reply_getUser(userId string) ([]byte, error) {
 	}
 	app.infoLog.Printf("...get user:\n\t%v", string(bUser))
 	return bUser, nil
+}
+
+func (app *application) reply_addUser(user string) error {
+	var u models.User
+	err := json.Unmarshal([]byte(user), &u)
+	if err != nil {
+		return err
+	}
+	return app.insertUser(u)
+}
+
+func (app *application) reply_deleteUser(userId string) error {
+
+	return app.deleteUser(userId)
 }

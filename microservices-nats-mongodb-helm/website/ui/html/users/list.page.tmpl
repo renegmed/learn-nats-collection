@@ -3,18 +3,32 @@
 {{define "main"}}
 
 <div class="album py-5 bg-light">
-    <div class="container">
+    <div class="container"> 
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newUserModal">
+            Add new User
+        </button>
 
         <div class="row">
             {{range .Users}}
             <div class="col-md-3">
                 <div class="card mb-3 shadow-sm">
                     <div class="card-body">
+                        <span style="visibility:hidden;"> 
+                          <data class="user-id">{{.ID.Hex}}</data>
+                          <data class="user-name">{{.Name}}</data>
+                          <data class="user-lastname">{{.LastName}}</data>
+                        </span>
                         <p class="card-text">{{.Name}} {{.LastName}}</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <a class="btn btn-sm btn-outline-secondary" href="/users/view/{{.ID.Hex}}" role="button">View</a>
-                            </div>
+                            <div class="btn-group">                               
+                                <button type="button" class="view-user btn btn-primary" data-toggle="modal" data-target="#viewUserModal">
+                                  View
+                                </button>
+                                <button type="button" class="delete-user btn btn-primary" data-toggle="modal" data-target="#deleteUserModal">
+                                    Delete
+                                </button>                             
+                            </div>                            
                         </div>
                     </div>
                 </div>
@@ -24,5 +38,232 @@
 
     </div>
 </div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="newUserModal" tabindex="-1" role="dialog" aria-labelledby="newUserModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newUserModal">New User</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form>
+        <div class="modal-body">      
+          <div class="form-group">
+              <label for="usr">First Name:</label>
+              <input type="text" class="input-firstname form-control">
+          </div>
+          <div class="form-group">
+              <label for="pwd">Last Name:</label>
+              <input type="text" class="input-lastname form-control">
+          </div> 
+        </div>
+     
+        <div class="modal-footer">
+          <button type="submit" class="add-user-cancel btn btn-secondary" data-dismiss="modal" value="cancel" id="add-user-cancel">Cancel</button>
+          <button type="submit" class="add-user-save btn btn-primary" value="save" id="add-user-save">Save</button>
+        </div>
+ 
+       </form>
+
+    </div>
+  </div>
+</div>
+
+
+
+<!-- View User Modal -->
+<div class="modal fade" id="viewUserModal" tabindex="-1" role="dialog" aria-labelledby="viewUserModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewUserModal">View User</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form>
+        <div class="modal-body">          
+          <div class="form-group">
+              <label for="usr" id="view-userid">ID:</label>             
+          </div>     
+          <div class="form-group">
+              <label for="usr"id="view-username">First Name:</label>             
+          </div>
+          <div class="form-group">
+              <label for="pwd" id="view-userlastname">Last Name:</label>              
+          </div> 
+        </div>
+     
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-secondary" data-dismiss="modal" value="Close" id="view-user-cancel">Close</button>        
+      </div>
+
+       </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Delete User Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteUserModal">Delete User</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form>
+         <div class="modal-body"> 
+            <div class="data-user-id" style="visibility:hidden"></div>
+            <div class="form-group">
+                 <label for="usr" id="delete-userid">ID:</label>             
+            </div>     
+            <div class="form-group">
+                 <label for="usr"id="delete-username">First Name:</label>             
+            </div>
+            <div class="form-group">
+                 <label for="pwd" id="delete-userlastname">Last Name:</label>              
+            </div> 
+         </div>         
+
+         <div class="modal-footer">
+           <button type="submit" class="delete-user-cancel btn btn-secondary" data-dismiss="modal" value="Cancel" >Cancel</button>
+           <button type="submit" class="delete-user-delete btn btn-primary" value="Save">Delete</button>
+         </div>
+
+       </form>
+
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  
+  $(document).ready(function(){
+    
+    $(".add-user-save").click(function (event) {
+        console.log("...Add user save");
+        var firstname = $(this).parents("form").find(".input-firstname").val();
+		    var lastname = $(this).parents("form").find(".input-lastname").val();
+        console.log("...firstname:",firstname);
+        console.log("...lastname:",lastname); 
+
+
+         // Creating a XHR object
+        let xhr = new XMLHttpRequest();
+        let url = "http://localhost:8080/users/add";
+    
+        // open a connection
+        xhr.open("POST", url, true);
+        
+        // Set the request header i.e. which type of content you are sending
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        // Create a state change callback
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {       // && xhr.status === 200) {
+                // Print received data from server
+                console.log("...xhr status: ", xhr.status);
+                console.log("...xhr response text: ", xhr.responseText);
+                alert("Status:" + xhr.status + "  Response: " + xhr.responseText);
+            }
+        };
+        
+
+        // Converting JSON data to string
+        //var data = JSON.stringify({ "name": firstname, "lastname": lastname });
+        var data = `
+           { 
+             "name": "` + firstname +`", 
+             "lastname": "` + lastname + `" 
+           }
+        `   
+        // Sending data with the request
+
+        console.log("...JSON data to send:\n", data);
+
+        xhr.send(data);      
+
+      
+    });
+  
+    $(".add-user-cancel").click(function (event) {
+        console.log("...Add user cancel");
+
+    });
+  
+   
+    $(".view-user").click(function (event) {
+        console.log("...View user");
+        var userid = $(this).parents(".card").find(".user-id").text();
+		    var name = $(this).parents(".card").find(".user-name").text();
+		    var lastname = $(this).parents(".card").find(".user-lastname").text();
+
+        console.log("... user name:", name);
+
+        $("#data-userid").text(userid);
+        $("#view-userid").text("ID: " +userid);
+        $("#view-username").text("Name: " +name);
+        $("#view-userlastname").text("Last Name: " +lastname);
+
+    });
+
+    $(".delete-user").click(function (event) {
+        console.log("...Delete user");
+        console.log("...View user");
+        var userid = $(this).parents(".card").find(".user-id").text();
+		    var name = $(this).parents(".card").find(".user-name").text();
+		    var lastname = $(this).parents(".card").find(".user-lastname").text();
+
+        console.log("... user name:", name);
+
+        $(".data-user-id").text(userid);
+        $("#delete-userid").text("ID: " +userid);
+        $("#delete-username").text("Name: " +name);
+        $("#delete-userlastname").text("Last Name: " +lastname); 
+    });
+
+ 
+ 
+    $(".delete-user-delete").click(function (event) {
+ 
+        var userid = $(this).parents("form").find(".data-user-id").text();
+		     
+        console.log("... user id:", userid); 
+        
+         // Creating a XHR object
+        let xhr = new XMLHttpRequest();
+        let url = "http://localhost:8080/users/delete/"+userid;
+    
+        // open a connection
+        xhr.open("POST", url, true); 
+         
+        // Create a state change callback
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) && xhr.status === 200) {
+                // Print received data from server
+                console.log("...xhr status: ", xhr.status);
+                console.log("...xhr response text: ", xhr.responseText);
+                alert("Status:" + xhr.status + "  Response: " + xhr.responseText);
+            }
+        };
+     
+        xhr.send();      
+
+
+    });
+
+  });   
+ 
+</script>
 
 {{end}}

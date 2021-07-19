@@ -67,7 +67,7 @@ func (app *Application) getUsers() (*userTemplateData, error) {
 
 	err = json.Unmarshal(msg.Data, &users)
 	if err != nil {
-		return &utd, fmt.Errorf("Error on unmarshal user list, %v", err)
+		return &utd, fmt.Errorf("error on unmarshal user list, %v", err)
 	}
 
 	fmt.Println("...Users:\n\t", users)
@@ -132,3 +132,62 @@ func (app *Application) getUserByID(id string) (*models.User, error) {
 
 	return &user, nil
 }
+
+func (app *Application) usersAdd(w http.ResponseWriter, r *http.Request) {
+	var user models.User
+
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, "Internal Server Error - decoding user", 500)
+	}
+
+	usr, err := json.Marshal(user)
+	if err != nil {
+		http.Error(w, "Internal Server Error - marshal user", 500)
+	}
+	// var utd userTemplateData
+
+	subj := app.Requests.Users + ".add"
+	//payload := "Request add new user"
+	//msg, err := app.Conn.Request(subj, []byte(payload), 2*time.Second)
+	_, err = app.Conn.Request(subj, usr, 2*time.Second)
+	if err != nil {
+		http.Error(w, "Internal Server Error - request NATS connection", 500)
+	}
+
+}
+
+func (app *Application) usersDelete(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	userID := vars["id"]
+
+	app.InfoLog.Println("...user to delete:", userID)
+
+	subj := app.Requests.Users + ".delete"
+
+	_, err := app.Conn.Request(subj, []byte(userID), 2*time.Second)
+	if err != nil {
+		http.Error(w, "Internal Server Error - request NATS connection", 500)
+	}
+}
+
+// func (app *Application) usersDelete(id string) (*models.User, error) {
+// 	var user models.User
+
+// 	subj := app.Requests.Users + ".delete"
+// 	payload := id
+// 	msg, err := app.Conn.Request(subj, []byte(payload), 2*time.Second)
+// 	if err != nil {
+// 		return &user, err
+// 	}
+
+// 	app.InfoLog.Println("...handlers_users delete user\n\t", string(msg.Data))
+
+// 	err = json.Unmarshal(msg.Data, &user)
+// 	if err != nil {
+// 		return &user, err
+// 	}
+
+// 	return &user, nil
+// }

@@ -97,13 +97,35 @@ func (app *application) insert(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 	}
 
-	// Insert new user
-	insertResult, err := app.users.Insert(u)
+	// // Insert new user
+	// insertResult, err := app.users.Insert(u)
+	// if err != nil {
+	// 	app.serverError(w, err)
+	// }
+
+	// app.infoLog.Printf("New user have been created, id=%s", insertResult.InsertedID)
+
+	err = app.insertUser(u)
 	if err != nil {
 		app.serverError(w, err)
 	}
 
-	app.infoLog.Printf("New user have been created, id=%s", insertResult.InsertedID)
+}
+
+func (app *application) insertUser(user models.User) error {
+
+	app.infoLog.Println("...user to insert:\n", user)
+
+	// Insert new user
+	insertResult, err := app.users.Insert(user)
+	if err != nil {
+		app.infoLog.Println("...Error on insert user,", err)
+		return err
+	}
+
+	app.infoLog.Printf("New user has been created, id=%s", insertResult.InsertedID)
+
+	return nil
 }
 
 func (app *application) delete(w http.ResponseWriter, r *http.Request) {
@@ -111,13 +133,26 @@ func (app *application) delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	app.infoLog.Println("...user to delete:\n", id)
+	app.infoLog.Println("...user ID to delete:\n", id)
 
-	// Delete user by id
-	deleteResult, err := app.users.Delete(id)
+	err := app.deleteUser(id)
 	if err != nil {
 		app.serverError(w, err)
 	}
 
-	app.infoLog.Printf("...Have been eliminated %d user(s)", deleteResult.DeletedCount)
+}
+
+func (app *application) deleteUser(userId string) error {
+
+	app.infoLog.Println("...user to delete:\n", userId)
+
+	deleteResult, err := app.users.Delete(userId)
+	if err != nil {
+		app.infoLog.Println("...Error on delete user,", err)
+		return err
+	}
+
+	app.infoLog.Printf("Number of users deleted =%d", deleteResult.DeletedCount)
+
+	return nil
 }

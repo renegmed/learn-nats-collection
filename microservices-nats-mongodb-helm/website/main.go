@@ -30,6 +30,7 @@ func main() {
 	bookingsTopic := flag.String("bookings", "", "Bookings request subject")
 	flag.Parse()
 
+	log.Println("... nats servers url", *serversUrl)
 	// Create logger for writing information and error messages.
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)

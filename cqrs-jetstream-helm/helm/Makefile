@@ -1,3 +1,6 @@
+enable-ingress:
+	minikube addons enable ingress
+
 create-namespace-nats:
 	kubectl create ns nats 
 

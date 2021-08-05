@@ -1,6 +1,9 @@
 package main
 
-import "encoding/json"
+import (
+	"cinema-app/showtimes/pkg/models"
+	"encoding/json"
+)
 
 func (app *application) reply_allShowtimes() ([]byte, error) {
 	// Get all user stored
@@ -27,4 +30,19 @@ func (app *application) reply_getShowtime(id string) ([]byte, error) {
 	}
 	app.infoLog.Printf("...reply_getShowtime:\n\t%v", string(bShowtime))
 	return bShowtime, nil
+}
+
+func (app *application) reply_addShowTime(showtime string) ([]byte, error) {
+	var st models.ShowTime
+	err := json.Unmarshal([]byte(showtime), &st)
+	if err != nil {
+		return nil, err
+	}
+	err = app.insertShowTime(&st)
+	bShowtime, err := json.Marshal(st)
+	return bShowtime, err
+}
+
+func (app *application) reply_deleteShowTime(id string) error {
+	return app.deleteShowTime(id)
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -117,6 +118,30 @@ func main() {
 		app.errorLog.Println("...Error from reply get showtime,", err)
 	})
 
+	nconn.QueueSubscribe(*topic+".add", *queueName+"_add", func(msg *nats.Msg) {
+
+		infoLog.Println("...QueueSubscribe called - topic", *topic+".add")
+		app.infoLog.Printf("...Subject: %s  Data: %s", msg.Subject, string(msg.Data))
+		bShowTime, err := app.reply_addShowTime(string(msg.Data))
+		if err == nil {
+			msg.Respond(bShowTime)
+			return
+		}
+
+		app.errorLog.Println("...Error from reply add showtime,", err)
+	})
+
+	nconn.QueueSubscribe(*topic+".delete", *queueName+"_delete", func(msg *nats.Msg) {
+
+		infoLog.Println("...QueueSubscribe called - topic", *topic+".delete")
+		app.infoLog.Printf("...Subject: %s  Data: %s", msg.Subject, string(msg.Data))
+		err := app.reply_deleteShowTime(string(msg.Data))
+		if err == nil {
+			msg.Respond([]byte(fmt.Sprintf("ShowTime %s was deleted", msg.Data)))
+			return
+		}
+		app.errorLog.Println("...Error from reply delete showtime,", err)
+	})
 	nconn.Flush()
 
 	if err := nconn.LastError(); err != nil {

@@ -10,7 +10,11 @@ import (
 
 	nats "github.com/nats-io/nats.go"
 
+<<<<<<< HEAD
 	"ordering-app/model"
+=======
+	"jetstream-order/model"
+>>>>>>> c39dd6d... added crud for showtimes and other modifications
 )
 
 const (

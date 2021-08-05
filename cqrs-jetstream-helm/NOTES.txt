@@ -13,15 +13,19 @@ $ make install-nats
 $ make install-nack 
 
 
-$ make install-cqrs-prodread 
-
-$ make portforward-cqrs-prodread 
-
-
 $ make install-cqrs-prodwrite
 
 $ make portforward-cqrs-prodwrite 
 
+
+$ make install-cqrs-prodread 
+
+$ make portforward-cqrs-prodread 
+
+NOTE: need to start prodwrite else prodread will not run
+
+
+$ make get-products 
 
 $ make write1
 $ make write2 

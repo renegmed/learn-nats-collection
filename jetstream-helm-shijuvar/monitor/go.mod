@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 module ordering-app
+=======
+module jetstream-monitor
+>>>>>>> c39dd6d... added crud for showtimes and other modifications
 
 go 1.16
 

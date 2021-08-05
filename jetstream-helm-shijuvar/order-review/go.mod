@@ -1,4 +1,4 @@
-module jsdemo-shijuvar
+module jetstream-review
 
 go 1.16
 

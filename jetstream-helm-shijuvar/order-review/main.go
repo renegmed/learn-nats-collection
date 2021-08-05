@@ -9,7 +9,7 @@ import (
 
 	nats "github.com/nats-io/nats.go"
 
-	"jsdemo-shijuvar/model"
+	"jetstream-review/model"
 )
 
 const (

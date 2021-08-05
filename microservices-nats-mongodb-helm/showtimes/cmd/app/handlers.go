@@ -127,15 +127,26 @@ func (app *application) insert(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.infoLog.Println("...showtime to insert:\n", m)
-
-	// Insert new showtime
-	m.CreatedAt = time.Now()
-	insertResult, err := app.showtimes.Insert(m)
+	err = app.insertShowTime(&m)
 	if err != nil {
 		app.serverError(w, err)
 	}
+}
+
+func (app *application) insertShowTime(st *models.ShowTime) error {
+
+	app.infoLog.Println("...showtime to insert:\n", st)
+
+	st.CreatedAt = time.Now()
+	insertResult, err := app.showtimes.Insert(*st)
+	if err != nil {
+		app.infoLog.Println("...error on insert() data access,", err)
+		return err
+	}
 
 	app.infoLog.Printf("...New showtime have been created, id=%s", insertResult.InsertedID)
+
+	return nil
 }
 
 func (app *application) delete(w http.ResponseWriter, r *http.Request) {
@@ -145,11 +156,23 @@ func (app *application) delete(w http.ResponseWriter, r *http.Request) {
 
 	app.infoLog.Println("...showtime to delete:\n", id)
 
-	// Delete showtime by id
-	deleteResult, err := app.showtimes.Delete(id)
+	err := app.reply_deleteShowTime(id)
 	if err != nil {
 		app.serverError(w, err)
 	}
+}
+
+func (app *application) deleteShowTime(id string) error {
+
+	app.infoLog.Println("...showtime to delete:\n", id)
+
+	deleteResult, err := app.showtimes.Delete(id)
+	if err != nil {
+		app.infoLog.Println("...error on delete() data access,", err)
+		return err
+	}
 
 	app.infoLog.Printf("...Have been eliminated %d showtime(s)", deleteResult.DeletedCount)
+
+	return nil
 }

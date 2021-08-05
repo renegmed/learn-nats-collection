@@ -4,18 +4,30 @@
 
 <div class="album py-5 bg-light">
     <div class="container">
-
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newShowTimeModal">
+            Add New ShowTime
+        </button>
         <div class="row">
             {{range .ShowTimes}}
             <div class="col-md-3">
                 <div class="card mb-3 shadow-sm">
                     <div class="card-body">
+                     <span style="visibility:hidden;"> 
+                          <data class="showtime-id">{{.ID.Hex}}</data>
+                          <data class="showtime-date">{{.Date}}</data>
+                          <data class="showtime-movie">{{.Movies}}</data>                         
+                        </span>
                         <p class="card-text">{{.Date}}</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <a class="btn btn-sm btn-outline-secondary" href="/showtimes/view/{{.ID.Hex}}" role="button">View</a>
-                            </div>
-                        </div>
+                            <div class="btn-group">                               
+                                <button type="button" class="view-showtime btn btn-primary" data-toggle="modal" data-target="#viewShowTimeModal">
+                                  View
+                                </button>
+                                <button type="button" class="delete-showtime btn btn-primary" data-toggle="modal" data-target="#deleteShowTimeModal">
+                                    Delete
+                                </button>                             
+                            </div>      
+                        </div> 
                     </div>
                 </div>
             </div>
@@ -25,4 +37,230 @@
     </div>
 </div>
 
+
+<!-- Add ShowTime Modal -->
+<div class="modal fade" id="newShowTimeModal" tabindex="-1" role="dialog" aria-labelledby="newShowTimeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="newShowTimeModal">New ShowTime</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form>
+        <div class="modal-body">      
+          <div class="form-group">
+              <label for="dat">Date:</label>
+              <input type="text" class="input-date form-control">
+          </div>
+          <div class="form-group">
+              <label for="mov">Movie:</label>
+              <input type="text" class="input-movie form-control">
+          </div>            
+        </div>
+     
+        <div class="modal-footer">
+          <button type="submit" class="add-showtime-cancel btn btn-secondary" data-dismiss="modal" value="cancel" >Cancel</button>
+          <button type="submit" class="add-showtime-save btn btn-primary" value="save">Save</button>
+        </div>
+ 
+       </form>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- View ShowTime Modal -->
+<div class="modal fade" id="viewShowTimeModal" tabindex="-1" role="dialog" aria-labelledby="viewShowTimeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewShowTimeModal">View ShowTime</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form>
+        <div class="modal-body">          
+          <div class="form-group">
+              <label for="stid" id="view-showtimeid">ID:</label>             
+          </div>
+          <div class="form-group">
+              <label for="dat" id="view-date">Date:</label>              
+          </div>      
+          <div class="form-group">
+              <label for="mov"id="view-movie">Movie:</label>             
+          </div> 
+        </div>
+     
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-secondary" data-dismiss="modal" value="Close" id="view-showtime-cancel">Close</button>        
+      </div>
+
+       </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Delete ShowTime Modal -->
+<div class="modal fade" id="deleteShowTimeModal" tabindex="-1" role="dialog" aria-labelledby="deleteShowTimeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteShowTimeModal">Delete ShowTime</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form>
+         <div class="modal-body"> 
+            <div class="data-showtime-id" style="visibility:hidden"></div>
+            <div class="form-group">
+                 <label for="stid" id="delete-showtimeid">ID:</label>             
+            </div>     
+            <div class="form-group">
+                 <label for="dat" id="delete-date">Date:</label>             
+            </div>
+            <div class="form-group">
+                 <label for="mov" id="delete-movie">Movie:</label>              
+            </div>           
+         </div>         
+
+         <div class="modal-footer">
+           <button type="submit" class="delete-showtime-cancel btn btn-secondary" data-dismiss="modal" value="Cancel" >Cancel</button>
+           <button type="submit" class="delete-showtime-delete btn btn-primary" value="Save">Delete</button>
+         </div>
+
+       </form>
+
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  
+  $(document).ready(function(){
+    
+    $(".add-showtime-save").click(function (event) {
+        console.log("...Add movie save");
+        var date = $(this).parents("form").find(".input-date").val();
+		var movie = $(this).parents("form").find(".input-movie").val();
+       
+        
+        console.log("...date:",date);
+        console.log("...movie:",movie); 
+      
+         // Creating a XHR object
+        let xhr = new XMLHttpRequest();
+        let url = "http://localhost:8080/showtimes/add";
+    
+        // open a connection
+        xhr.open("POST", url, true);
+        
+        // Set the request header i.e. which type of content you are sending
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        // Create a state change callback
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {       // && xhr.status === 200) {
+                // Print received data from server
+                console.log("...xhr status: ", xhr.status);
+                console.log("...xhr response text: ", xhr.responseText);
+                alert("Status:" + xhr.status + "  Response: " + xhr.responseText);
+            }
+        }; 
+
+        // Converting JSON data to string        
+        var data = `
+           { 
+             "date": "` + date +`", 
+             "movie": "` + movie +`" 
+           }
+        `   
+        // Sending data with the request
+
+        console.log("...JSON data to send:\n", data);
+
+        //alert(data);
+
+        xhr.send(data);    
+      
+    });
+  
+    $(".add-movie-cancel").click(function (event) {
+        console.log("...Add movie cancel");
+
+    });
+  
+   
+    $(".view-showtime").click(function (event) {
+        console.log("...View showtime");
+        var showtimeid = $(this).parents(".card").find(".showtime-id").text();
+		var date = $(this).parents(".card").find(".showtime-date").text(); 
+        var movie = $(this).parents(".card").find(".showtime-movie").text(); 
+        
+        console.log("... showtime id:", showtimeid);
+        console.log("... showtime date:", date);
+        console.log("... showtime movie:", movie);
+        
+        $("#data-showtimeid").text(showtimeid);
+        $("#view-showtimeid").text("ID: " + showtimeid);
+        $("#view-date").text("Date: " + date);
+        $("#view-movie").text("Movie: " + movie);  
+    });
+
+    $(".delete-showtime").click(function (event) {
+        console.log("...Delete showtime");
+        
+        var movieid = $(this).parents(".card").find(".movie-id").text();
+		var title = $(this).parents(".card").find(".movie-title").text();
+		var director = $(this).parents(".card").find(".movie-director").text();
+        var rating = $(this).parents(".card").find(".movie-rating").text();
+
+        console.log("... title:", title);
+
+        $(".data-movie-id").text(movieid);
+        $("#delete-movieid").text("ID: " + movieid);
+        $("#delete-title").text("Title: " + title);
+        $("#delete-director").text("Director: " + director); 
+        $("#delete-rating").text("Rating: " + rating); 
+    });
+
+ 
+ 
+    $(".delete-showtime-delete").click(function (event) {
+ 
+        var movieid = $(this).parents("form").find(".data-movie-id").text();
+		     
+        console.log("... movie id:", movieid); 
+        
+         // Creating a XHR object
+        let xhr = new XMLHttpRequest();
+        let url = "http://localhost:8080/movies/delete/"+movieid;
+    
+        // open a connection
+        xhr.open("POST", url, true); 
+         
+        // Create a state change callback
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                // Print received data from server
+                console.log("...xhr status: ", xhr.status);
+                console.log("...xhr response text: ", xhr.responseText);
+                alert("Status:" + xhr.status + "  Response: " + xhr.responseText);
+            }
+        };
+     
+        xhr.send();     
+    });
+
+  });   
+ 
+</script>
 {{end}}

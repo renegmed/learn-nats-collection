@@ -1,4 +1,4 @@
-module jsdemo-shijuvar
+module jetstream-order
 
 go 1.16
 

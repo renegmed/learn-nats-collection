@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -148,6 +149,7 @@ func main() {
 		app.infoLog.Printf("...Subject: %s  Data: %s", msg.Subject, string(msg.Data))
 		err := app.reply_deleteMovie(string(msg.Data))
 		if err == nil {
+			msg.Respond([]byte(fmt.Sprintf("Movie %s was deleted", msg.Data)))
 			return
 		}
 

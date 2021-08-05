@@ -1,0 +1,311 @@
+NAME: nats
+LAST DEPLOYED: Thu Aug  5 09:16:31 2021
+NAMESPACE: default
+STATUS: pending-install
+REVISION: 1
+TEST SUITE: None
+HOOKS:
+MANIFEST:
+---
+# Source: nats/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nats-config
+  namespace: nats
+  labels:
+    helm.sh/chart: nats-0.8.0
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/instance: nats
+    app.kubernetes.io/version: "2.2.6"
+    app.kubernetes.io/managed-by: Helm
+data:
+  nats.conf: |
+    # PID file shared with configuration reloader.
+    pid_file: "/var/run/nats/nats.pid"
+
+    ###############
+    #             #
+    # Monitoring  #
+    #             #
+    ###############
+    http: 8222
+    server_name: $POD_NAME
+    ###################################
+    #                                 #
+    # NATS JetStream                  #
+    #                                 #
+    ###################################
+    jetstream {
+      max_mem: 1Gi
+    }
+    ###################################
+    #                                 #
+    # NATS MQTT                       #
+    #                                 #
+    ###################################
+---
+# Source: nats/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nats
+  namespace: nats
+  labels:
+    helm.sh/chart: nats-0.8.0
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/instance: nats
+    app.kubernetes.io/version: "2.2.6"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/instance: nats
+  clusterIP: None
+  ports:
+  - name: client
+    port: 4222
+  - name: cluster
+    port: 6222
+  - name: monitor
+    port: 8222
+  - name: metrics
+    port: 7777
+  - name: leafnodes
+    port: 7422
+  - name: gateways
+    port: 7522
+  - name: mqtt
+    port: 1883
+---
+# Source: nats/templates/nats-box.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nats-box
+  namespace: nats
+  labels:
+    app: nats-box
+    chart: nats-0.8.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nats-box
+  template:
+    metadata:
+      labels:
+        app: nats-box
+    spec:
+      volumes:
+      containers:
+      - name: nats-box
+        image: natsio/nats-box:0.6.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          null
+        env:
+        - name: NATS_URL
+          value: nats
+        command:
+         - "tail"
+         - "-f"
+         - "/dev/null"
+        volumeMounts:
+---
+# Source: nats/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nats
+  namespace: nats
+  labels:
+    helm.sh/chart: nats-0.8.0
+    app.kubernetes.io/name: nats
+    app.kubernetes.io/instance: nats
+    app.kubernetes.io/version: "2.2.6"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nats
+      app.kubernetes.io/instance: nats
+  replicas: 1
+  serviceName: nats
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "7777"
+        prometheus.io/scrape: "true"
+      labels:
+        app.kubernetes.io/name: nats
+        app.kubernetes.io/instance: nats
+    spec:
+      # Common volumes for the containers.
+      volumes:
+      - name: config-volume
+        configMap:
+          name: nats-config
+
+      # Local volume shared with the reloader.
+      - name: pid
+        emptyDir: {}
+
+      #################
+      #               #
+      #  TLS Volumes  #
+      #               #
+      #################
+
+      
+
+      # Required to be able to HUP signal and apply config
+      # reload to the server without restarting the pod.
+      shareProcessNamespace: true
+
+      #################
+      #               #
+      #  NATS Server  #
+      #               #
+      #################
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: nats
+        image: synadia/nats-server:nightly
+        imagePullPolicy: IfNotPresent
+        resources:
+          {}
+        ports:
+        - containerPort: 4222
+          name: client
+        - containerPort: 7422
+          name: leafnodes
+        - containerPort: 7522
+          name: gateways
+        - containerPort: 6222
+          name: cluster
+        - containerPort: 8222
+          name: monitor
+        - containerPort: 7777
+          name: metrics
+        command:
+         - "nats-server"
+         - "--config"
+         - "/etc/nats-config/nats.conf"
+
+        # Required to be able to define an environment variable
+        # that refers to other environment variables.  This env var
+        # is later used as part of the configuration file.
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CLUSTER_ADVERTISE
+          value: $(POD_NAME).nats.$(POD_NAMESPACE).svc
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/nats-config
+          - name: pid
+            mountPath: /var/run/nats
+
+        # Liveness/Readiness probes against the monitoring.
+        #
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8222
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8222
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+
+        # Gracefully stop NATS Server on pod deletion or image upgrade.
+        #
+        lifecycle:
+          preStop:
+            exec:
+              # Using the alpine based NATS image, we add an extra sleep that is
+              # the same amount as the terminationGracePeriodSeconds to allow
+              # the NATS Server to gracefully terminate the client connections.
+              #
+              command:
+              - "/bin/sh"
+              - "-c"
+              - "nats-server -sl=ldm=/var/run/nats/nats.pid && /bin/sleep 60"
+
+      #################################
+      #                               #
+      #  NATS Configuration Reloader  #
+      #                               #
+      #################################
+      
+      - name: reloader
+        image: natsio/nats-server-config-reloader:0.6.1
+        imagePullPolicy: IfNotPresent
+        resources:
+          null
+        command:
+         - "nats-server-config-reloader"
+         - "-pid"
+         - "/var/run/nats/nats.pid"
+         - "-config"
+         - "/etc/nats-config/nats.conf"
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/nats-config
+          - name: pid
+            mountPath: /var/run/nats
+      
+
+      ##############################
+      #                            #
+      #  NATS Prometheus Exporter  #
+      #                            #
+      ##############################
+      
+      - name: metrics
+        image: natsio/prometheus-nats-exporter:0.7.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          {}
+        args:
+        - -connz
+        - -routez
+        - -subz
+        - -varz
+        - -prefix=nats
+        - -use_internal_server_id
+        - http://localhost:8222/
+        ports:
+        - containerPort: 7777
+          name: metrics
+      
+
+  volumeClaimTemplates:
+
+NOTES:
+You can find more information about running NATS on Kubernetes
+in the NATS documentation website:
+
+  https://docs.nats.io/nats-on-kubernetes/nats-kubernetes
+
+NATS Box has been deployed into your cluster, you can
+now use the NATS tools within the container as follows:
+
+  kubectl exec -n default -it deployment/nats-box -- /bin/sh -l
+
+  nats-box:~# nats-sub test &
+  nats-box:~# nats-pub test hi
+  nats-box:~# nc nats 4222
+
+Thanks for using NATS!

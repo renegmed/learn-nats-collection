@@ -1,4 +1,4 @@
-module jsdemo-shijuvar
+module jetstream-monitor
 
 go 1.16
 

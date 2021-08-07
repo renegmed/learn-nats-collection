@@ -1,0 +1,55 @@
+Status: working
+
+Based on Cloud Native Go book sample application Chap 8 Event Sourcing and CQRS
+
+
+Logged error on query when command is 
+
+    $ make change-position 
+
+2021/07/02 00:04:53 Error on updating repository on 
+changed position event, cannot transform type bson.D 
+to a BSON Document: WriteArray can only write a Array 
+while positioned on a Element or Value but is positioned 
+on a TopLevel
+
+
+$ cd helm
+
+$ make install-nats 
+$ make install-nack 
+
+$ make install-mongodb 
+
+$ make install-events 
+
+$ make install-query 
+$ make install-commands 
+
+$ make portforward-commands 
+
+
+Posts:
+
+Post position:
+
+curl -XPOST http://localhost:7070/api/cmds/position -d '{"drone_id":"drone-1", "latitude": 81.231, "longitude": 43.1231, "altitude": 2301.1, "current_speed": 41.3, "heading_cardinal": 1}'
+
+
+Post telemetry:
+
+curl -XPOST http://localhost:7070/api/cmds/telemetry -d '{"drone_id":"drone-1", "battery": 72, "uptime": 6941, "core_temp": 21 }'
+
+
+Post alert:
+curl -XPOST http://localhost:7070/api/cmds/alertsignal -d '{"drone_id":"drone-1", "fault_code": 12, "description": "all the things are failing"}'
+
+
+
+Queries:
+
+curl http://localhost:7070/api/cmds/query-position/drone-1
+
+curl http://localhost:7070/api/cmds/query-telemetry/drone-1
+
+curl http://localhost:7070/api/cmds/query-alertsignal/drone-1

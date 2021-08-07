@@ -1,0 +1,17 @@
+name: drones-events
+namespace: drones
+deployment:
+  image: "renegmedal/drones-events"
+  tag: "v0.0.1"
+  replicas: 1
+  command: "/root/events"   
+  server: nats.nats.svc.cluster.local:4222  
+  dburl: mongodb://drones-mongodb:27017
+  # dburl: mongodb://drones-mongodb.drones.svc.local:27017
+  #dburl: mongodb://localhost:27017
+
+service:
+  http_port: 8080
+  http_nodePort: 30020
+  
+  

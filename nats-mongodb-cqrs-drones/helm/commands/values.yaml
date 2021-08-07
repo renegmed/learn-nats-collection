@@ -1,0 +1,16 @@
+name: drones-commands
+namespace: drones
+deployment:
+  image: "renegmedal/drones-commands"
+  tag: "v0.0.1"
+  replicas: 1
+  command: "/root/cmds" 
+  port: 8080
+  server: nats.nats.svc.cluster.local:4222  
+ 
+
+service:
+  http_port: 8080
+  http_nodePort: 30020
+  
+  

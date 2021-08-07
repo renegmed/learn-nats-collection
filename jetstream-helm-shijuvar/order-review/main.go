@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"flag"
 	"log"
-	"time"
 
 	nats "github.com/nats-io/nats.go"
 
-	"jsdemo-shijuvar/model"
+	"ordering-app/model"
 )
 
 const (
@@ -44,7 +43,8 @@ func main() {
 
 	// Create Pull based consumer with maximum 128 inflight.
 	// PullMaxWaiting defines the max inflight pull requests.
-	sub, err := js.PullSubscribe(subSubjectName, "order-review", nats.PullMaxWaiting(128))
+	// sub, err := js.PullSubscribe(subSubjectName, "order-review", nats.PullMaxWaiting(128))
+	sub, err := js.PullSubscribe(subSubjectName, "order-review")
 	if err != nil {
 		log.Println("...Error on pull subscribe,", err)
 		log.Fatal(err)
@@ -52,22 +52,27 @@ func main() {
 
 	log.Println("...Pull subscribe with subscription subject name:", subSubjectName)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
+	// ctx, cancel := context.WithTimeout(context.Background(), 3000*time.Second)
+	// defer cancel()
+
+	ctx := context.Background()
 
 	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-		}
+		// select {
+		// case <-ctx.Done():
+		// 	log.Println("...ctx.Done")
+		// 	return
+		// default:
+		// }
 		msgs, _ := sub.Fetch(10, nats.Context(ctx))
 		for _, msg := range msgs {
 			msg.Ack()
 			var order model.Order
 			err := json.Unmarshal(msg.Data, &order)
 			if err != nil {
+				log.Println("... Error on unmarshal order")
 				log.Fatal(err)
+				//continue
 			}
 			log.Println("...order-review service")
 			log.Printf("...OrderID:%d, CustomerID: %s, Status:%s\n", order.OrderID, order.CustomerID, order.Status)

@@ -8,7 +8,7 @@ import (
 
 	nats "github.com/nats-io/nats.go"
 
-	"jsdemo-shijuvar/model"
+	"ordering-app/model"
 )
 
 func main() {

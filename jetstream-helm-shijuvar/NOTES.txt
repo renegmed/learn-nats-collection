@@ -1,6 +1,6 @@
 Status: working  
 
-Article: Building Distributed Event Streaming Systems In Go With NATS JetStream
+Article: Building Distributed Event Streaming Systems In Go With NATS JetStream by Shiju Varghese
 URL: https://shijuvar.medium.com/building-distributed-event-streaming-systems-in-go-with-nats-jetstream-3938e6dc7a13
 
 

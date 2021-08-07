@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"flag"
 	"log"
+	"math/rand"
 	"strconv"
+	"time"
 
 	nats "github.com/nats-io/nats.go"
 
-	"jsdemo-shijuvar/model"
+	"ordering-app/model"
 )
 
 const (
@@ -55,7 +57,10 @@ func main() {
 // with subject "ORDERS.created"
 func createOrder(js nats.JetStreamContext) error {
 	var order model.Order
-	for i := 1; i <= 10; i++ {
+	//for i := 1; i <= 10; i++ {
+	for {
+		i := rand.Intn(1000) + 100
+
 		order = model.Order{
 			OrderID:    i,
 			CustomerID: "Cust-" + strconv.Itoa(i),
@@ -67,6 +72,11 @@ func createOrder(js nats.JetStreamContext) error {
 			return err
 		}
 		log.Printf("Order with OrderID:%d has been published\n", i)
+
+		s := rand.Intn(5000) + 200
+
+		time.Sleep(time.Duration(s) * time.Millisecond)
+
 	}
 	return nil
 }

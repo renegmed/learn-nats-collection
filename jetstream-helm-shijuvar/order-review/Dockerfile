@@ -7,7 +7,7 @@ COPY main.go ./
 COPY model/ model/
 
 RUN go mod download
-RUN go build -o monitor .
+RUN go build -o order-review .
  
 
 FROM alpine:latest
@@ -16,11 +16,11 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 
 # Copy the Pre-built binary file from the previous stage. Observe we also copied the .env file
-COPY --from=builder /app/monitor . 
+COPY --from=builder /app/order-review . 
 
 RUN pwd
 RUN ls -als /root
 
-# CMD ["./monitor","-s", "nats://localhost:4222"]
+# CMD ["./order-review","-s", "nats://localhost:4222"]
  
  

@@ -1,4 +1,4 @@
-module jsdemo-shijuvar
+module ordering-app
 
 go 1.16
 
